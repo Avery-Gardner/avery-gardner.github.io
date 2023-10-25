@@ -106,7 +106,7 @@ function updateParticle(p, speed) {
 
             // Same Color Attraction/Repulsion
             if (p.color == p2.color) {
-                affectParticle(p, p2, 0.4, 5, speed, false)
+                affectParticle(p, p2, 0.3, 5, speed, false)
             } else {
                 affectParticle(p, p2, -0.8, 10, speed, false);
             }
@@ -154,26 +154,26 @@ function update() {
         drawParticle(particles[i], selection == i, size);
     }
 
-    if (mouseDown) {
-        for (let j = 0; j < 200; j += 10) {
-            let dst = j;
-            if (dst < particleSize * 2) dst = particleSize * 2;
-            if (dst > 300) return;
+    // if (mouseDown) {
+    //     for (let j = 0; j < 200; j += 10) {
+    //         let dst = j;
+    //         if (dst < particleSize * 2) dst = particleSize * 2;
+    //         if (dst > 300) return;
 
-            let factor = 1 / (dst * dst + 5);
+    //         let factor = 1 / (dst * dst + 5);
 
-            ctx.beginPath();
-            ctx.strokeStyle = "#fff";
-            ctx.lineWidth = 10;
-            ctx.arc(mouseX, mouseY, j, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.closePath();
+    //         ctx.beginPath();
+    //         ctx.strokeStyle = "#fff";
+    //         ctx.lineWidth = 10;
+    //         ctx.arc(mouseX, mouseY, j, 0, Math.PI * 2);
+    //         ctx.stroke();
+    //         ctx.closePath();
 
-            // p.vx += directionX * factor * speed;
-            // p.vy += directionY * factor * speed;
-        }
-    }
-    // drawMouseInteraction();
+    //         // p.vx += directionX * factor * speed;
+    //         // p.vy += directionY * factor * speed;
+    //     }
+    // }
+    drawMouseInteraction();
 
     requestAnimationFrame(update);
 }

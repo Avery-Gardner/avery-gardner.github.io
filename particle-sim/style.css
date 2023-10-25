@@ -24,16 +24,8 @@ html, body {
     overflow: auto;
 }
 
-h1 {
+#settings-header {
     text-align: center;
-}
-
-body {
-    text-align: center;
-}
-
-a {
-    color: lightgreen;
 }
 
 button {
