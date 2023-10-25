@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simulation</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="simulation">
+        <canvas id="simulation-canvas"></canvas>
+    </div>
+
+    <div id="settings">
+        <h1 id="settings-header">Settings</h1>
+        <div id="buttons">
+            <button id="start-button">Start</button>
+            <button id="stop-button">Stop</button>
+            <button id="reset-button">Reset</button>
+        </div>
+        <div id="inputs">
+            <input id="speed-input" type="number" value="500"></input>
+            <text id="speed-input-label">Speed</text>
+            <input id="selection-input" type="number" value="0"></input>
+            <text id="selection-input-label">Selection</text>
+            <input id="size-input" type="number" value="8"></input>
+            <text id="size-input-label">Size</text>
+        </div>
+        <!-- <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul> -->
+    </div>
+
+    <script src="setup.js"></script>
+    <script src="util.js"></script>
+    <script src="life.js"></script>
+</body>
+
+</html>
