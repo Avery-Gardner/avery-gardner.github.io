@@ -22,6 +22,7 @@ html, body {
     padding: 10px;
     background-color: #223;
     overflow: auto;
+    /* scroll-padding: 300px; */
 }
 
 #settings-header {
@@ -43,7 +44,7 @@ button {
     border-radius: 10px;
 }
 
-input {
+input, select {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: larger;
     font-weight: bold;
@@ -55,6 +56,11 @@ input {
     border: 0px;
     color: white;
     border-radius: 10px;
+}
+
+::placeholder {
+    color: white;
+    opacity: 0.5; /* Firefox */
 }
 
 #start-button {
@@ -70,7 +76,7 @@ input {
 }
 
 #speed-input {
-    transform: translate(calc(-50% + 35px), 155px);
+    transform: translate(calc(-50% + 35px), 150px);
     padding-left: 6px;
 }
 
@@ -80,11 +86,11 @@ input {
     position: absolute;
     left: 50%;
     color: white;
-    transform: translate(calc(-50% - 70px), 159px);
+    transform: translate(calc(-50% - 70px), 154px);
 }
 
 #selection-input {
-    transform: translate(calc(-50% + 35px), 210px);
+    transform: translate(calc(-50% + 35px), 200px);
     padding-left: 6px;
 }
 
@@ -94,11 +100,11 @@ input {
     position: absolute;
     left: 50%;
     color: white;
-    transform: translate(calc(-50% - 83px), 214px);
+    transform: translate(calc(-50% - 83px), 204px);
 }
 
 #size-input {
-    transform: translate(calc(-50% + 35px), 265px);
+    transform: translate(calc(-50% + 35px), 250px);
     padding-left: 6px;
 }
 
@@ -108,5 +114,63 @@ input {
     position: absolute;
     left: 50%;
     color: white;
-    transform: translate(calc(-50% - 64px), 269px);
+    transform: translate(calc(-50% - 64px), 254px);
+}
+
+ul {
+    position: absolute;
+    left: 50%;
+    top: 500px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    height: 60px;
+}
+
+li>input {
+    width: 90px;
+    height: 30px;
+}
+
+li>select {
+    width: 90px;
+    height: 30px;
+}
+
+#listnum {
+    transform: translate(calc(-50% - 70px), 0px);
+    padding-left: 6px;
+    color: white;
+}
+
+#liststr {
+    transform: translate(calc(-50% + 37px), 0px);
+    padding-left: 6px;
+    padding-right: 6px;
+    color: white;
+}
+
+#listrem {
+    transform: translate(calc(-50% + 110px), 1px);
+    width: 30px;
+    height: 30px;
+}
+
+#add-item {
+    position: absolute;
+    top: 450px;
+    width: 120px;
+    transform: translate(calc(-50% + 45px), -50%);
+}
+
+#item-list-label {
+    font-size: larger;
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    color: white;
+    transform: translate(calc(-50% - 64px), 350px);
 }

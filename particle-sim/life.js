@@ -82,6 +82,7 @@ function drawMouseInteraction() {
 }
 
 function affectParticle(p, p2, force, range, speed) {
+    
     let dx = p2.x - p.x;
     let dy = p2.y - p.y;
     let dst = Math.sqrt(dx * dx + dy * dy);
@@ -118,15 +119,20 @@ function updateParticle(p, speed) {
 }
 
 function setup() {
-    create(500, "red");
-    create(500, "lime");
-    create(500, "blue");
+    processListItems();
+    for (let i = 0; i < initialAmounts.length; i++) {
+        if (initialColors[i] == "") return;
+        create(initialAmounts[i], initialColors[i]);
+    }
 }
 
 function update() {
+    if (resetCalled) { reset(); resetCalled = false }
+
     const speed = speedInput.value;
     const selection = selectionInput.value;
     const size = sizeInput.value;
+    particleSize = size;
 
     if (isPlaying) {
         for (let i = 0; i < particles.length; i++) {
