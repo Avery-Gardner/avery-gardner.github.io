@@ -18,6 +18,7 @@ stopButton.onclick = function() { stop(); }
 saveButton.onclick = function() { save(); }
 loadButton.onclick = function() { load(); }
 clearButton.onclick = function() { reset(); }
+preset.onchange = function() { reset(); }
 
 canvas.onmousedown = function(event) {
     rightClick = event.button == 2;
@@ -48,12 +49,15 @@ function stop() {
 
 function save() {
     console.log("Saving...");
+
     localStorage.setItem("saved-points", JSON.stringify(points));
     console.log("Saved points array as");
     console.log(points);
+    
     localStorage.setItem("saved-sticks", JSON.stringify(sticks));
     console.log("Saved sticks array as");
     console.log(sticks);
+
     console.log("Saved");
 }
 
@@ -62,9 +66,10 @@ function load() {
     console.log("Loading...");
 
     points = JSON.parse(localStorage.getItem("saved-points"));
+    // Converts the raw position objects to vectors to fix weird stuff
     points.forEach(p => {
         p.pos = new Vector(p.pos.x, p.pos.y);
-        p.prevPos = new Vector(p.prevPos.x, p.prevPos.y);
+        p.vel = new Vector(p.vel.x, p.vel.y);
     });
     console.log("Loaded points array as");
     console.log(points);
@@ -87,7 +92,8 @@ function reset() {
 function point(x, y, locked) {
     const point = {
         pos: new Vector(x, y),
-        prevPos: new Vector(x, y),
+        vel: new Vector(0, 0),
+        // prevPos: new Vector(x, y),
         locked: locked
     }
     points.push(point);
@@ -157,15 +163,17 @@ function calculateIntersections(a, b, c, d) {
 }
 
 function setup() {
-    let offset = new Vector(100, 100);
-    let gridSize = new Vector(51, 30);
-    let tileSize = 40;
-    for (let y = 0; y < gridSize.y; y++) {
-        for (let x = 0; x < gridSize.x; x++) {
-            let currentPoint = points.length;
-            point(offset.x + x * tileSize, offset.y + y * tileSize, y == 0 && x % 5 == 0);
-            if (y - 1 >= 0) stick(currentPoint, currentPoint - gridSize.x);
-            if (x - 1 >= 0) stick(currentPoint, currentPoint - 1);
+    if (preset.value == "Grid") {
+        let offset = new Vector(100, 100);
+        let gridSize = new Vector(51, 30);
+        let tileSize = 40;
+        for (let y = 0; y < gridSize.y; y++) {
+            for (let x = 0; x < gridSize.x; x++) {
+                let currentPoint = points.length;
+                point(offset.x + x * tileSize, offset.y + y * tileSize, y == 0 && x % 5 == 0);
+                if (y - 1 >= 0) stick(currentPoint, currentPoint - gridSize.x);
+                if (x - 1 >= 0) stick(currentPoint, currentPoint - 1);
+            }
         }
     }
 }
@@ -182,11 +190,8 @@ function update() {
             }
             if (rightClick) {
                 let point = points[clickedPoint];
-                if (clickedPoint == -1) {
-                    selectedPoint = -1;
-                } else {
-                    point.locked = point.locked ? false : true;
-                }
+                if (clickedPoint == -1) selectedPoint = -1;
+                else point.locked = point.locked ? false : true;
             } else {
                 if (clickedPoint == -1) {
                     if (selectedPoint != -1) {
@@ -194,44 +199,53 @@ function update() {
                         point(mousePos.x, mousePos.y, false);
                         stick(selectedPoint, newPoint);
                         selectedPoint = newPoint;
-                    }
-                    else {
-                        point(mousePos.x, mousePos.y, false);
-                    }
+                    } else point(mousePos.x, mousePos.y, false);
                 } else {
                     if (selectedPoint != -1) {
                         console.log("Created stick between points " + selectedPoint + " and " + clickedPoint);
                         stick(selectedPoint, clickedPoint);
                         selectedPoint = -1;
-                    } else {
-                        selectedPoint = clickedPoint;
-                    }
+                    } else selectedPoint = clickedPoint;
                 }
             }
         }
     } else {
-        
-        let mouseIntersections = calculateIntersections(mousePos.x, mousePos.y, prevMousePos.x, prevMousePos.y);
-        for (let i = 0; i < mouseIntersections.length; i++) {
-            sticks.splice(mouseIntersections[i], 1);
-        }
-        
+        // Update points
         points.forEach((p) => {
             if (!p.locked) {
-                const posBeforeUpdate = p.pos;
-                p.pos = Vector.add(p.pos, Vector.sub(p.pos, p.prevPos));
-                p.pos.y += gravityScale;
-                p.prevPos = posBeforeUpdate;
+                p.pos = Vector.add(p.pos, p.vel);
+                p.vel.y += gravityScale;
+
+                if (p.pos.y > dspHeight - pointSize) {
+                    p.vel.y = -p.vel.y / 4;
+                    p.pos.y = dspHeight - pointSize;
+                    p.vel.x *= 0.8;
+                }
             }
         });
 
+        // Update sticks
         for (let i = 0; i < 8; i++) {
             sticks.forEach((s) => {
                 let stickCenter = Vector.add(points[s.p1].pos, points[s.p2].pos).div(2);
                 let stickDir = Vector.sub(points[s.p1].pos, points[s.p2].pos).normalize();
-                if (!points[s.p1].locked) points[s.p1].pos = Vector.add(stickCenter, stickDir.setMag(s.length).div(2));
-                if (!points[s.p2].locked) points[s.p2].pos = Vector.sub(stickCenter, stickDir.setMag(s.length).div(2));
+                if (!points[s.p1].locked) {
+                    const motion = Vector.add(stickCenter, stickDir.setMag(s.length).div(2));
+                    points[s.p1].vel = Vector.add(points[s.p1].vel, Vector.sub(motion, points[s.p1].pos));
+                    points[s.p1].pos = motion;
+                }
+                if (!points[s.p2].locked) {
+                    const motion = Vector.sub(stickCenter, stickDir.setMag(s.length).div(2));
+                    points[s.p2].vel = Vector.add(points[s.p2].vel, Vector.sub(motion, points[s.p2].pos));
+                    points[s.p2].pos = motion;
+                }
             });
+        }
+
+        // Cutting sticks with the mouse
+        let mouseIntersections = calculateIntersections(mousePos.x, mousePos.y, prevMousePos.x, prevMousePos.y);
+        for (let i = 0; i < mouseIntersections.length; i++) {
+            sticks.splice(mouseIntersections[i], 1);
         }
     }
 
