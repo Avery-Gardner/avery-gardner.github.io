@@ -1,0 +1,88 @@
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #334;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#simulation {
+    position: fixed;
+    top: 0px;
+    left: 320px;
+}
+
+#settings {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 99;
+    width: 300px;
+    height: 100%;
+    padding: 10px;
+    background-color: rgb(37, 37, 60);
+    overflow: auto;
+}
+
+#settings-header {
+    text-align: center;
+}
+
+button {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 35px;
+    background-color: rgb(38, 202, 62);
+    border: 0px;
+    color: white;
+    border-radius: 10px;
+}
+
+input, select {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    width: 120px;
+    height: 30px;
+    background-color: rgb(31, 136, 172);
+    border: 0px;
+    color: white;
+    border-radius: 10px;
+}
+
+::placeholder {
+    color: white;
+    opacity: 0.5;
+}
+
+#start-button {
+    transform: translate(calc(-50% - 70px), 25px);
+    background-color: rgb(38, 202, 62);
+}
+
+#stop-button {
+    transform: translate(calc(-50% + 70px), 25px);
+    background-color: rgb(255, 99, 99);
+}
+
+#save-button {
+    transform: translate(calc(-50% - 70px), 90px);
+    background-color: rgb(38, 202, 62);
+}
+
+#load-button {
+    transform: translate(calc(-50% + 70px), 90px);
+    background-color: rgb(255, 84, 189);
+}
+
+#clear-button {
+    transform: translate(calc(-50%), 155px);
+    background-color: rgb(255, 99, 99);
+}

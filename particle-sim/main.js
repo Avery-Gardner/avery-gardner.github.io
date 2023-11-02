@@ -81,21 +81,20 @@ function drawMouseInteraction() {
     ctx.closePath();
 }
 
-function affectParticle(p, p2, force, range, speed) {
-    
+function affectParticle(p, p2, range, force, speed) {
     let dx = p2.x - p.x;
     let dy = p2.y - p.y;
     let dst = Math.sqrt(dx * dx + dy * dy);
-    if (dst < particleSize * 2) dst = particleSize * 2;
-    if (dst > 300) return;
+    // if (dst < particleSize * 2) dst = particleSize * 2;
 
-    let factor = force / (dst * dst + range);
+    let factor = Math.pow(Math.max(0, (range * range) - (dst * dst)), 3) / Math.pow(range, 5);
+    if (factor == 0) return;
 
     let directionX = dx / dst;
     let directionY = dy / dst;
 
-    p.vx += directionX * factor * speed;
-    p.vy += directionY * factor * speed;
+    p.vx += directionX * factor / (-range * 50) * force * speed;
+    p.vy += directionY * factor / (-range * 50) * force * speed;
 }
 
 function updateParticle(p, speed) {
@@ -103,17 +102,17 @@ function updateParticle(p, speed) {
         let p2 = particles[i];
         if (p !== p2) {
             // Universal Repulsion
-            affectParticle(p, p2, -0.4, 0, speed, false);
+            affectParticle(p, p2, -100, 3, speed, false);
 
             // Same Color Attraction/Repulsion
             if (p.color == p2.color) {
-                affectParticle(p, p2, 0.3, 5, speed, false)
+                affectParticle(p, p2, 200, 3, speed, false)
             } else {
-                affectParticle(p, p2, -0.8, 10, speed, false);
+                affectParticle(p, p2, -300, 3, speed, false);
             }
 
             // Mouse Repulsion
-            if (mouseDown) affectParticle(p, {x: mouseX, y: mouseY}, -0.2, 10, speed, true);
+            if (mouseDown) affectParticle(p, {x: mouseX, y: mouseY}, -200, 1.5, speed, true);
         }
     }
 }
