@@ -3,6 +3,7 @@ let sticks = [];
 
 let isPlaying = false;
 let mousePos = new Vector(0, 0);
+let prevMousePos = new Vector(0, 0);
 let mouseClick = false;
 let mouseDown = false;
 let rightClick = false;
@@ -132,12 +133,41 @@ function drawLine(p1, p2) {
     ctx.closePath();
 }
 
+function calculateIntersections(a, b, c, d) {
+    let intersections = [];
+    for (let i = 0; i < sticks.length; i++) {
+        const st = sticks[i];
+        const p = points[st.p1].pos.x;
+        const q = points[st.p1].pos.y;
+        const r = points[st.p2].pos.x;
+        const s = points[st.p2].pos.y;
+        let det, gamma, lambda;
+        det = (c - a) * (s - q) - (r - p) * (d - b);
+        if (det == 0) {
+            continue;
+        } else {
+            lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+            gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+            if ((0 < lambda && lambda < 1) && (0 < gamma && gamma < 1)) {
+                intersections.push(i);
+            }
+        }
+    }
+    return intersections;
+}
+
 function setup() {
-    // point(dspWidth / 2, dspHeight / 2, true);
-    // point(dspWidth / 2 + 100, dspHeight / 2 - 20, false);
-    // point(dspWidth / 2 + 200, dspHeight / 2 - 70, false);
-    // stick(0, 1);
-    // stick(1, 2);
+    let offset = new Vector(100, 100);
+    let gridSize = new Vector(51, 30);
+    let tileSize = 40;
+    for (let y = 0; y < gridSize.y; y++) {
+        for (let x = 0; x < gridSize.x; x++) {
+            let currentPoint = points.length;
+            point(offset.x + x * tileSize, offset.y + y * tileSize, y == 0 && x % 5 == 0);
+            if (y - 1 >= 0) stick(currentPoint, currentPoint - gridSize.x);
+            if (x - 1 >= 0) stick(currentPoint, currentPoint - 1);
+        }
+    }
 }
 
 function update() {
@@ -180,6 +210,12 @@ function update() {
             }
         }
     } else {
+        
+        let mouseIntersections = calculateIntersections(mousePos.x, mousePos.y, prevMousePos.x, prevMousePos.y);
+        for (let i = 0; i < mouseIntersections.length; i++) {
+            sticks.splice(mouseIntersections[i], 1);
+        }
+        
         points.forEach((p) => {
             if (!p.locked) {
                 const posBeforeUpdate = p.pos;
@@ -189,7 +225,7 @@ function update() {
             }
         });
 
-        for (let i = 0; i < 1; i++) { 
+        for (let i = 0; i < 8; i++) {
             sticks.forEach((s) => {
                 let stickCenter = Vector.add(points[s.p1].pos, points[s.p2].pos).div(2);
                 let stickDir = Vector.sub(points[s.p1].pos, points[s.p2].pos).normalize();
@@ -200,6 +236,8 @@ function update() {
     }
 
     if (mouseClick) mouseClick = false;
+    prevMousePos.x = mousePos.x;
+    prevMousePos.y = mousePos.y;
 }
 
 function render() {
