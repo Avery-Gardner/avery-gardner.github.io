@@ -16,9 +16,8 @@ const gravityScale = 1;
 startButton.onclick = function() { start(); }
 stopButton.onclick = function() { stop(); }
 saveButton.onclick = function() { save(); }
-loadButton.onclick = function() { load(); }
 clearButton.onclick = function() { reset(); }
-preset.onchange = function() { reset(); }
+loadSelection.onchange = function() { reset(); }
 
 canvas.onmousedown = function(event) {
     rightClick = event.button == 2;
@@ -50,32 +49,57 @@ function stop() {
 function save() {
     console.log("Saving...");
 
-    localStorage.setItem("saved-points", JSON.stringify(points));
-    console.log("Saved points array as");
+    let configName = prompt("Enter the name that this configuration will be saved as, or leave it blank to cancel.", "");
+    if (configName == null || configName == "") return;
+
+    let savedConfigs = JSON.parse(localStorage.getItem("saved-configs"));
+    if (savedConfigs == null) savedConfigs = [];
+    if (!savedConfigs.includes(configName)) savedConfigs.push(configName);
+    localStorage.setItem("saved-configs", JSON.stringify(savedConfigs));
+
+    localStorage.setItem(configName + "-points", JSON.stringify(points));
+    console.log("Saved points array as " + configName + "-points");
     console.log(points);
     
-    localStorage.setItem("saved-sticks", JSON.stringify(sticks));
-    console.log("Saved sticks array as");
+    localStorage.setItem(configName + "-sticks", JSON.stringify(sticks));
+    console.log("Saved sticks array as " + configName + "-sticks");
     console.log(sticks);
+
+    updateLoadSelection();
 
     console.log("Saved");
 }
 
-function load() {
+function load(configName) {
     stop();
     console.log("Loading...");
 
-    points = JSON.parse(localStorage.getItem("saved-points"));
+    if (configName == undefined) configName = prompt("Enter the name of the configuration to load, or leave it blank to cancel.", "");
+    if (configName == null || configName == "") return;
+
+    points = [];
+    sticks = [];
+
+    points = JSON.parse(localStorage.getItem(configName + "-points"));
+    if (points == null) {
+        points = [];
+        sticks = [];
+        return;
+    }
     // Converts the raw position objects to vectors to fix weird stuff
     points.forEach(p => {
         p.pos = new Vector(p.pos.x, p.pos.y);
         p.vel = new Vector(p.vel.x, p.vel.y);
     });
-    console.log("Loaded points array as");
+    console.log("Loaded points array from " + configName + "-points");
     console.log(points);
-
-    sticks = JSON.parse(localStorage.getItem("saved-sticks"));
-    console.log("Loaded sticks array as");
+    sticks = JSON.parse(localStorage.getItem(configName + "-sticks"));
+    if (sticks == null) {
+        points = [];
+        sticks = [];
+        return;
+    }
+    console.log("Loaded sticks array from " + configName + "-sticks");
     console.log(sticks);
 
     console.log("Loaded");
@@ -89,11 +113,29 @@ function reset() {
     setup();
 }
 
+function updateLoadSelection() {
+    let savedConfigs = JSON.parse(localStorage.getItem("saved-configs"));
+    if (savedConfigs == null) savedConfigs = [];
+
+    // Defaults
+    savedConfigs.unshift("Nothing", "Grid");
+
+    let selection = loadSelection.value;
+    for (let i = loadSelection.options.length - 1; i >= 0; i--) loadSelection.options[i].remove(i);
+    savedConfigs.forEach(function (config) {
+        const configElement = document.createElement("option");
+        configElement.setAttribute("id", "preset-option-" + config)
+        configElement.text = config;
+        loadSelection.add(configElement);
+    });
+    loadSelection.value = selection;
+    if (loadSelection.value == "") loadSelection.value = "Nothing";
+}
+
 function point(x, y, locked) {
     const point = {
         pos: new Vector(x, y),
         vel: new Vector(0, 0),
-        // prevPos: new Vector(x, y),
         locked: locked
     }
     points.push(point);
@@ -163,7 +205,10 @@ function calculateIntersections(a, b, c, d) {
 }
 
 function setup() {
-    if (preset.value == "Grid") {
+    updateLoadSelection();
+
+    if (loadSelection.value == "Nothing") return;
+    else if (loadSelection.value == "Grid") {
         let offset = new Vector(100, 100);
         let gridSize = new Vector(51, 30);
         let tileSize = 40;
@@ -175,6 +220,8 @@ function setup() {
                 if (x - 1 >= 0) stick(currentPoint, currentPoint - 1);
             }
         }
+    } else {
+        load(loadSelection.value);
     }
 }
 

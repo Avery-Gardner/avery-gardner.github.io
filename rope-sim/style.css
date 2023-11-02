@@ -77,26 +77,21 @@ input, select {
     background-color: rgb(38, 202, 62);
 }
 
-#load-button {
-    transform: translate(calc(-50% + 70px), 90px);
-    background-color: rgb(255, 84, 189);
-}
-
 #clear-button {
-    transform: translate(calc(-50%), 155px);
-    background-color: rgb(255, 99, 99);
+    transform: translate(calc(-50% + 70px), 90px);
+    background-color: rgb(99, 164, 255);
 }
 
-#preset {
-    transform: translate(calc(-50% + 30px), 250px);
+#load {
+    transform: translate(calc(-50% + 30px), 150px);
     padding-left: 6px;
 }
 
-#preset-label {
+#load-label {
     font-size: larger;
     font-weight: bold;
     position: absolute;
     left: 50%;
     color: white;
-    transform: translate(calc(-50% - 70px), 254px);
+    transform: translate(calc(-50% - 70px), 154px);
 }
